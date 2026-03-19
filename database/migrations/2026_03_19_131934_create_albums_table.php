@@ -6,22 +6,33 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('albums', function (Blueprint $table) {
+        Schema::create('photo_albums', function (Blueprint $table) {
             $table->id();
+            $table->string('title');
+            $table->string('slug')->unique();
+            $table->text('description')->nullable();
+            $table->string('cover_image')->nullable();
+            $table->boolean('is_published')->default(false)->index();
+            $table->timestamp('published_at')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('photos', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('album_id')->constrained('photo_albums')->cascadeOnDelete();
+            $table->string('path');
+            $table->string('caption')->nullable();
+            $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('albums');
+        Schema::dropIfExists('photos');
+        Schema::dropIfExists('photo_albums');
     }
 };
