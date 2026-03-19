@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class NewsPost extends Model
 {
+    protected $table = 'news_posts';
+
     use SoftDeletes;
 
     protected $fillable = ['title', 'slug', 'excerpt', 'content', 'cover_image', 'is_published', 'published_at'];

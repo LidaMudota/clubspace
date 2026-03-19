@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PhotoAlbum extends Model
 {
+    protected $table = 'photo_albums';
+
     use SoftDeletes;
 
     protected $fillable = ['title', 'slug', 'description', 'cover_image', 'is_published', 'published_at'];
