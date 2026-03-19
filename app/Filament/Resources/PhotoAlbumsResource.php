@@ -2,14 +2,14 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\PhotoAlbum;
+use App\Models\Album;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
 class PhotoAlbumsResource extends Resource
 {
-    protected static ?string $model = PhotoAlbum::class;
+    protected static ?string $model = Album::class;
 
     public static function form(Schema $schema): Schema
     {

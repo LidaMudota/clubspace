@@ -8,14 +8,16 @@ return new class extends Migration
 {
     public function up(): void
     {
-        $tables = ['albums', 'events', 'bookings', 'news_posts'];
+        $tables = ['albums', 'events', 'bookings', 'news'];
 
         foreach ($tables as $table) {
-            if (! Schema::hasColumn($table, 'deleted_at')) {
-                Schema::table($table, function (Blueprint $blueprint) {
-                    $blueprint->softDeletes();
-                });
+            if (! Schema::hasTable($table) || Schema::hasColumn($table, 'deleted_at')) {
+                continue;
             }
+
+            Schema::table($table, function (Blueprint $blueprint) {
+                $blueprint->softDeletes();
+            });
         }
     }
 

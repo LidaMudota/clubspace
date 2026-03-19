@@ -1,3 +1,33 @@
 <?php
+
 namespace App\Models;
-class Album extends PhotoAlbum {}
+
+use Database\Factories\PhotoAlbumFactory;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Album extends Model
+{
+    use SoftDeletes;
+
+    protected $table = 'albums';
+
+    protected $fillable = ['title', 'slug', 'description', 'cover_image', 'is_published', 'published_at'];
+
+    protected function casts(): array
+    {
+        return ['is_published' => 'boolean', 'published_at' => 'datetime'];
+    }
+
+    protected static function newFactory(): Factory
+    {
+        return PhotoAlbumFactory::new();
+    }
+
+    public function photos(): HasMany
+    {
+        return $this->hasMany(Photo::class, 'album_id');
+    }
+}

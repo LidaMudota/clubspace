@@ -3,10 +3,10 @@
 namespace Database\Seeders;
 
 use App\Enums\EventStatus;
+use App\Models\Album;
 use App\Models\Event;
-use App\Models\NewsPost;
+use App\Models\News;
 use App\Models\Photo;
-use App\Models\PhotoAlbum;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -20,9 +20,9 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Event::factory(5)->create(['status' => EventStatus::Published]);
-        NewsPost::factory(5)->create(['is_published' => true, 'published_at' => now()]);
+        News::factory(5)->create(['is_published' => true, 'published_at' => now()]);
 
-        PhotoAlbum::factory(3)->create(['is_published' => true, 'published_at' => now()])
-            ->each(fn (PhotoAlbum $album) => Photo::factory(5)->create(['album_id' => $album->id]));
+        Album::factory(3)->create(['is_published' => true, 'published_at' => now()])
+            ->each(fn (Album $album) => Photo::factory(5)->create(['album_id' => $album->id]));
     }
 }

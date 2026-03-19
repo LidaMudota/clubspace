@@ -2,14 +2,14 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\NewsPost;
+use App\Models\News;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
 class NewsPostsResource extends Resource
 {
-    protected static ?string $model = NewsPost::class;
+    protected static ?string $model = News::class;
 
     public static function form(Schema $schema): Schema
     {
