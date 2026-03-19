@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('photo_albums', function (Blueprint $table) {
+        Schema::create('albums', function (Blueprint $table) {
             $table->id();
             $table->string('title');
             $table->string('slug')->unique();
@@ -22,7 +22,7 @@ return new class extends Migration
 
         Schema::create('photos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('album_id')->constrained('photo_albums')->cascadeOnDelete();
+            $table->foreignId('album_id')->constrained('albums')->cascadeOnDelete();
             $table->string('path');
             $table->string('caption')->nullable();
             $table->unsignedInteger('sort_order')->default(0);
@@ -33,6 +33,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('photos');
-        Schema::dropIfExists('photo_albums');
+        Schema::dropIfExists('albums');
     }
 };

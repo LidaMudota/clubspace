@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PhotoAlbum extends Model
 {
-    protected $table = 'photo_albums';
+    protected $table = 'albums';
 
     use SoftDeletes;
 
