@@ -6,7 +6,6 @@ use App\Models\Booking;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
-use App\Filament\Resources\BookingsResource\Pages;
 
 class BookingsResource extends Resource
 {
@@ -20,8 +19,7 @@ class BookingsResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([]);
+        return $schema->components([]);
     }
 
     public static function table(Table $table): Table
@@ -34,9 +32,9 @@ class BookingsResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListBookings::route('/'),
-            'create' => Pages\CreateBooking::route('/create'),
-            'edit' => Pages\EditBooking::route('/{record}/edit'),
+            'index' => \App\Filament\Resources\Bookings\Pages\ListBookings::route('/'),
+            'create' => \App\Filament\Resources\Bookings\Pages\CreateBooking::route('/create'),
+            'edit' => \App\Filament\Resources\Bookings\Pages\EditBooking::route('/{record}/edit'),
         ];
     }
 }
