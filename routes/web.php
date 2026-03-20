@@ -15,6 +15,7 @@ Route::get('/albums', [PublicPageController::class, 'albums'])->name('albums.ind
 Route::get('/albums/{slug}', [PublicPageController::class, 'albumShow'])->name('albums.show');
 Route::get('/about', [PublicPageController::class, 'about'])->name('about');
 Route::get('/contacts', [PublicPageController::class, 'contacts'])->name('contacts');
+Route::post('/contacts/feedback', [PublicPageController::class, 'contactFeedback'])->name('contacts.feedback');
 
 Route::middleware('auth')->group(function () {
     Route::get('/account/profile', [AccountController::class, 'profile'])->name('account.profile');

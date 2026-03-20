@@ -6,21 +6,37 @@ use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Models\Event;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class CreateDraftBookingAction
 {
     public function execute(User $user, Event $event): Booking
     {
-        if ($event->availableSeats() <= 0) {
-            throw ValidationException::withMessages(['event' => 'Свободные места закончились.']);
-        }
+        return DB::transaction(function () use ($user, $event) {
+            $lockedEvent = Event::query()->lockForUpdate()->findOrFail($event->id);
 
-        return Booking::query()->create([
-            'user_id' => $user->id,
-            'event_id' => $event->id,
-            'status' => BookingStatus::Draft,
-            'amount' => $event->price,
-        ]);
+            $existingBooking = Booking::query()
+                ->where('user_id', $user->id)
+                ->where('event_id', $lockedEvent->id)
+                ->whereIn('status', [BookingStatus::Draft, BookingStatus::Confirmed])
+                ->latest('id')
+                ->first();
+
+            if ($existingBooking) {
+                return $existingBooking;
+            }
+
+            if ($lockedEvent->availableSeats() <= 0) {
+                throw ValidationException::withMessages(['event' => 'Свободные места закончились.']);
+            }
+
+            return Booking::query()->create([
+                'user_id' => $user->id,
+                'event_id' => $lockedEvent->id,
+                'status' => BookingStatus::Draft,
+                'amount' => $lockedEvent->price,
+            ]);
+        });
     }
 }

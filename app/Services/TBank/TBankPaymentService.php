@@ -4,6 +4,7 @@ namespace App\Services\TBank;
 
 use App\Enums\BookingStatus;
 use App\Enums\PaymentStatus;
+use App\Jobs\SendUserNotificationJob;
 use App\Models\Booking;
 use App\Models\NotificationLog;
 use App\Models\Payment;
@@ -16,6 +17,16 @@ class TBankPaymentService
     public function initPayment(Booking $booking): Payment
     {
         return DB::transaction(function () use ($booking) {
+            $existing = Payment::query()
+                ->where('booking_id', $booking->id)
+                ->where('status', PaymentStatus::Pending)
+                ->latest('id')
+                ->first();
+
+            if ($existing) {
+                return $existing;
+            }
+
             $payment = Payment::query()->create([
                 'user_id' => $booking->user_id,
                 'booking_id' => $booking->id,
@@ -29,6 +40,7 @@ class TBankPaymentService
             $response = $this->client->initPayment([
                 'Amount' => $booking->amount,
                 'OrderId' => (string) $payment->id,
+                'Description' => 'Оплата участия в мероприятии Clubspace',
                 'NotificationURL' => config('services.tbank.notification_url'),
             ]);
 
@@ -37,7 +49,7 @@ class TBankPaymentService
                 'raw_notification' => $response,
             ]);
 
-            return $payment;
+            return $payment->refresh();
         });
     }
 
@@ -61,6 +73,17 @@ class TBankPaymentService
             if (($payload['Status'] ?? null) === 'CONFIRMED') {
                 $payment->update(['status' => PaymentStatus::Paid, 'paid_at' => now(), 'raw_notification' => $payload]);
                 $payment->booking()->update(['status' => BookingStatus::Confirmed, 'confirmed_at' => now()]);
+
+                SendUserNotificationJob::dispatch($payment->user_id, 'payment.confirmed', [
+                    'booking_id' => $payment->booking_id,
+                    'payment_id' => $payment->id,
+                    'amount' => $payment->amount,
+                ]);
+            }
+
+            if (in_array(($payload['Status'] ?? null), ['REJECTED', 'CANCELED'], true)) {
+                $payment->update(['status' => PaymentStatus::Failed, 'raw_notification' => $payload]);
+                $payment->booking()->update(['status' => BookingStatus::Cancelled]);
             }
 
             return $payment;

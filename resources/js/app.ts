@@ -7,12 +7,14 @@ import { initializeTheme } from '@/composables/useAppearance';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
+const pages = import.meta.glob<DefineComponent>('./pages/**/*.vue');
+const legacyPages = import.meta.glob<DefineComponent>('./Pages/**/*.vue');
+
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     resolve: (name) =>
-        resolvePageComponent(
-            `./pages/${name}.vue`,
-            import.meta.glob<DefineComponent>('./pages/**/*.vue'),
+        resolvePageComponent(`./pages/${name}.vue`, pages).catch(() =>
+            resolvePageComponent(`./Pages/${name}.vue`, legacyPages),
         ),
     setup({ el, App, props, plugin }) {
         createApp({ render: () => h(App, props) })
@@ -24,5 +26,4 @@ createInertiaApp({
     },
 });
 
-// This will set light / dark mode on page load...
 initializeTheme();
